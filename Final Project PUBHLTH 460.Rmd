@@ -1,0 +1,73 @@
+---
+title: "How has Covid-19 caused stress and anxiety about becoming sick over the holiday season of 2020-2021"
+author: "Ravi Patel"
+date: "5/06/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning = FALSE
+)
+devtools::install_github("cmu-delphi/covidcast", ref = "main",
+                         subdir = "R-packages/covidcast")
+```
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+library(covidcast)
+
+cc_worried_finances <- suppressMessages(
+covidcast_signal(data_source = "fb-survey", signal = "smoothed_worried_finances",
+                 start_day = "2020-10-01", end_day = "2021-01-31",
+                 geo_type = "state")
+)
+```
+
+```{r warning=FALSE, include=FALSE}
+cc_worried_sick <- suppressMessages(
+covidcast_signal(data_source = "fb-survey", signal = "smoothed_worried_become_ill",
+                 start_day = "2020-10-01", end_day = "2021-01-31",
+                 geo_type = "state")
+)
+```
+
+```{r warning=FALSE, include=FALSE}
+#install.packages("usmap")
+library(usmap) #import the package
+library(ggplot2) #use ggplot2 to add layer for visualization
+
+
+
+colnames(cc_worried_finances)[colnames(cc_worried_finances) == "geo_value"] <- "state"
+
+colnames(cc_worried_sick)[colnames(cc_worried_sick) == "geo_value"] <- "state"
+```
+	
+	Do you remember a time before Covid-19 came into our lives and caused such a drastic change in lifestyle. I remember being in India hearing about Covid-19 and thinking how it sucked to live in the affected area, but I was happy being safe where I was, but after coming back to the states I remember hearing about Covid-19 was spreading throughout the world. I remember thinking how I was grateful it hasn't affected me. Little did I know that in the near future I would be living in the most isolating time of my life. 
+	
+	All the collected data comes from CMU Delphi from Facebook Surveys. Throughout my analysis about people who are worried about becoming sick. In figure_1 we can see a similar graph as shown on the presentation and this graph shows that from October 2020-February 2021 there is a definite increase of people who are becoming worried over getting sick throughout time. In figure_2 we begin to look at some specific Northeast region states we can see that Rhode Island holds the highest number of people who are worried about getting sick. If we look further into the states we can see that MA, NJ and NH have the highest density of people who are worried around a value of 72. Rhode Island has the highest density of people around a value of 74, and NY has the highest density around a value of 65. Another thing we can see is that most of the medians of each state lies in the same area as the highest density for all except for NY and NH. Although Rhode Island may be the top ranking state for people worried from figure_2, if we look at figure_3 we can see that the actual top ranking state in the whole country for people who get worried about being sick is Washington DC. We can assume that the people who live there are probably the most worried because of DC is the capital of our country and unfortunately if everyone in DC got sick, it would mean that a lot of people/politicians would become sick causing a halt in progress for our economy and lawmaking. We can also see that Wyoming is the state with the least worry about becoming sick. I believe that the reason for this data is that Wyoming is a very loose densely populated area with the capital of Wyoming being the only city with a population more than 50,000. Since Wyoming is barren with people, it makes sense that people are less worried because those people are also less likely to get sick with covid-19 because of how it's possible that people will be staying isolated in their towns without really meeting many people.	
+	
+	Although we can only look towards time to see a future without covid-19, we can see how people have been consistently getting worried about becoming sick as time goes on. Even though the amount of people who get worried about covid has been increasing, we as a country need to realize how covid has been affecting the mental health of the population along with creating an isolated lifestyle that doesn’t help us in the long run. 
+
+
+Figure_1
+```{r echo=FALSE} 
+mask_by_date_plot <- ggplot(data = cc_worried_sick, aes(x = time_value , y = value)) + geom_point(color= '#ff6b48') + ylab("Percent of People Worried about getting Sick") + xlab("Month") + ggtitle("Percent of People Worried About Getting Sick during the Holiday Season") + geom_smooth(color = 'white') + theme_minimal()
+mask_by_date_plot
+```
+
+Figure_2
+```{r echo=FALSE}
+ggplot(subset(cc_worried_sick, state == "ma" | state == "ny" | state == "ri" | state == 'nj' | state == "nh"), aes(x = state, y = value, color = time_value, fill = state)) + geom_jitter() + geom_violin(trim = FALSE) + theme(axis.text.x = element_text(angle = 45, face = "bold", hjust = 1, size = 17), legend.position = "left") + ggtitle("Density of People Getting Axious About Getting Sick Per Month In NE") + geom_boxplot(width=.07, fill = "white", color = "black")
+```
+
+Figure_3
+```{r echo=FALSE}
+a <- ggplot(cc_worried_sick, aes(x = value, y = state))
+a + geom_bar( stat = "identity", width = 0.25, fill = "cyan") + labs(title = "People who got worried about becoming sick over Time")
+```
+
+
+
